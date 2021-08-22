@@ -25,7 +25,12 @@ mod complex_number {
                 imaginary:i,
             }
         }
-    
+
+        pub fn new_from_polar(ρ:f32, θ:f32) -> ComplexNumber{
+            let (a, b) = ComplexNumber::polar_to_cartesian(ρ, θ);
+            ComplexNumber::new(a, b)
+        }
+
         pub fn add(&self, b:&ComplexNumber) -> ComplexNumber{
             let real = self.real + b.real;
             let imaginary = self.imaginary + b.imaginary;
@@ -57,10 +62,29 @@ mod complex_number {
         pub fn conjugate(&self) -> ComplexNumber{
             ComplexNumber::new(self.real, -self.imaginary)
         }
+
+        pub fn get_cartesian(&self) -> (f32,f32){
+            (self.real, self.imaginary)
+        }
+
+        pub fn get_polar(&self) -> (f32, f32){
+            ComplexNumber::cartesian_to_polar(self.real, self.imaginary)
+        }
+
+        pub fn cartesian_to_polar(a:f32, b:f32) -> (f32, f32) {
+            let c = ComplexNumber::new(a, b);
+            (c.modulus(), c.imaginary.atan2(c.real))
+        }
+
+        pub fn polar_to_cartesian(ρ:f32, θ:f32 ) -> (f32, f32){
+            (ρ*θ.cos(), ρ*θ.sin())
+        }
     }
 
     
 }
+
+
 fn main() {
     let a = complex_number::ComplexNumber::new(-2.0, 1.0);
     println!("real: {}, imaginary: {}", a.real, a.imaginary);
@@ -69,7 +93,18 @@ fn main() {
     println!("{}", &b);
     println!("{:?}", &b);
     println!("{}", b.to_string());
+    let (x, y) = complex_number::ComplexNumber::cartesian_to_polar(b.real, b.imaginary);
+    println!("{}   {}", x, y);
+    let c = complex_number::ComplexNumber::new_from_polar(x, y);
+    println!("{}", b==c);
+    println!("{}", b);
+    println!("{}", c);
+    println!("{:?}", c.get_polar());
+    println!("{:?}", b.get_polar());
+    println!("{}", b.get_polar()==c.get_polar());
 
+    let h = complex_number::ComplexNumber::new_from_polar((4 as f32).sqrt(), 0.0);
+    println!("{}", h);
 }
 
 
@@ -81,7 +116,14 @@ mod tests{
         let c_num = complex_number::ComplexNumber::new(2.0, 3.0);
         assert_eq!(c_num.real, 2.0);
         assert_eq!(c_num.imaginary, 3.0);
-        
+    }
+
+    #[test]
+    fn create_complex_number_from_polar(){
+        // finding it difficult to find a more meaningful test due to floating point errors
+        let c = complex_number::ComplexNumber::new(2.0, 0.0);
+        assert_eq!(c.real, 2.0);
+        assert_eq!(c.imaginary, 0.0);
     }
 
     #[test]
@@ -99,7 +141,7 @@ mod tests{
         assert_eq!(c_num.to_string(), "-1-1i");
 
         let c_num = complex_number::ComplexNumber::new(-0.0, -0.0);
-        assert_eq!(c_num.to_string(), "0+0i");
+        assert_eq!(c_num.to_string(), "-0+-0i");
        
         let c_num = complex_number::ComplexNumber::new(0.12, -0.34);
         assert_eq!(c_num.to_string(), "0.12-0.34i");
@@ -175,5 +217,38 @@ mod tests{
  
         assert_eq!(a.conjugate(), conj);
 
+    }
+
+    #[test]
+    fn test_get_cartesian(){
+        let c = complex_number::ComplexNumber::new(2.0, 3.0);
+        let (a, b) = c.get_cartesian();
+        assert_eq!(a, c.real);
+        assert_eq!(b, c.imaginary);
+    }
+
+    #[test]
+    fn test_get_polar(){
+        // this is a really bad example where the cartesian and polar coordinates look the same
+        let c = complex_number::ComplexNumber::new(2.0, 0.0);
+        let (ρ, θ) = c.get_polar();
+        assert_eq!(2.0, ρ);
+        assert_eq!(0.0, θ);
+    }
+
+    #[test]
+    fn test_cartesian_to_polar(){
+        // this is a really bad example where the cartesian and polar coordinates look the same
+        let (ρ, θ) = complex_number::ComplexNumber::cartesian_to_polar(2.0, 0.0);
+        assert_eq!(ρ, 2.0);
+        assert_eq!(θ, 0.0);
+    }
+
+    #[test]
+    fn test_polar_to_cartesian(){
+        // this is a really bad example where the cartesian and polar coordinates look the same
+        let (a, b) = complex_number::ComplexNumber::polar_to_cartesian(2.0, 0.0);
+        assert_eq!(a, 2.0);
+        assert_eq!(b, 0.0);        
     }
 }
