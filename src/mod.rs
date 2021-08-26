@@ -1,1 +1,0 @@
-#![allow(mixed_script_confusables)]

@@ -1,4 +1,4 @@
-
+#![allow(mixed_script_confusables)]
 pub mod complex_vector;
 pub mod complex_number;
 use crate::complex_number::ComplexNumber;
