@@ -1,47 +1,78 @@
 
-use crate::complex_number::ComplexNumber;
+use std::fmt;
+use crate::complex::Complex;
 
-pub fn add(a_vec:&Vec<ComplexNumber>, b_vec:&Vec<ComplexNumber>) -> Vec<ComplexNumber> {
-    a_vec.iter().zip(b_vec.iter()).map(|(a, b)| a.add(&b)).collect()
+
+
+#[derive(Debug, PartialEq)]
+pub struct CVec2{
+    pub vector: Vec<Complex>,
 }
 
-pub fn inverse(a_vec:&Vec<ComplexNumber>) -> Vec<ComplexNumber> {
-    a_vec.iter().map(|a| a.mul(&ComplexNumber::new(-1.0, 0.0))).collect()
+
+impl fmt::Display for CVec2{
+    fn fmt(&self, f: &mut fmt::Formatter) ->fmt::Result{
+            write!(f, "{:?}", self.vector)
+    }
 }
 
-pub fn scalar_mul(scalar: &ComplexNumber, vec:&Vec<ComplexNumber>) -> Vec<ComplexNumber> {
-    vec.iter().map(|v| scalar.mul(&v)).collect()
+impl CVec2{
+
+    pub fn new(v:Vec<Complex>) -> CVec2{
+        CVec2{
+            vector: v,
+        }
+    }
+
+    pub fn add(self, b:&CVec2) -> CVec2 {
+        CVec2::new( 
+            self.vector.iter().zip(b.vector.iter()).map(|(a, b)| a.add(&b)).collect()
+        )
+    }
+    
+    pub fn inverse(&self) -> CVec2 {
+        CVec2::new(
+            self.vector.iter().map(|a| a.mul(&Complex::new(-1.0, 0.0))).collect()
+        )
+    }
+    
+    pub fn scalar_mul(&self, scalar: &Complex) -> CVec2 {
+        CVec2::new(
+            self.vector.iter().map(|v| scalar.mul(&v)).collect()
+        )
+    }
 }
+
 
 #[cfg(test)]
 mod tests{
     use super::*;
     #[test]
     fn test_add(){
-        let a_vec =vec![ComplexNumber::new(1.0, 1.0), ComplexNumber::new(-2.0, -2.0), ComplexNumber::new(3.0, 4.0)];
-        let b_vec =vec![ComplexNumber::new(1.0, 1.0), ComplexNumber::new(-5.0, 4.0), ComplexNumber::new(2.0, 7.0)];
-        let sum_vec =vec![ComplexNumber::new(2.0, 2.0), ComplexNumber::new(-7.0, 2.0), ComplexNumber::new(5.0, 11.0)];
+        let a =  CVec2::new(vec![Complex::new(1.0, 1.0), Complex::new(-2.0, -2.0), Complex::new(3.0, 4.0)]);
+        let b = CVec2::new(vec![Complex::new(1.0, 1.0), Complex::new(-5.0, 4.0), Complex::new(2.0, 7.0)]);
+        let sum = CVec2::new(vec![Complex::new(2.0, 2.0), Complex::new(-7.0, 2.0), Complex::new(5.0, 11.0)]);
         
-        assert_eq!(sum_vec, add(&a_vec, &b_vec));
+        assert_eq!(sum.vector, a.add(&b).vector);
     }
 
     #[test]
     fn test_inverse(){
-        let a_vec = vec![ComplexNumber::new(1.0, 1.0), ComplexNumber::new(-2.0, -2.0), ComplexNumber::new(3.0, 4.0)];
-        let inverse_a_vec = inverse(&a_vec);
-        let zero_vec = vec![ComplexNumber::new(0.0, 0.0), ComplexNumber::new(0.0, 0.0), ComplexNumber::new(0.0, 0.0)];
-        assert_eq!(zero_vec, add(&a_vec, &inverse_a_vec));
+        let a = CVec2::new(vec![Complex::new(1.0, 1.0), Complex::new(-2.0, -2.0), Complex::new(3.0, 4.0)]);
+        let inverse_a = a.inverse();
+        let zero_vec = CVec2::new(vec![Complex::new(0.0, 0.0), Complex::new(0.0, 0.0), Complex::new(0.0, 0.0)]);
+        assert_eq!(zero_vec, a.add(&inverse_a));
     }
 
     #[test]
     fn test_scalar_mul(){
-        let a_vec = vec![ComplexNumber::new(1.0, 1.0), ComplexNumber::new(-2.0, -2.0), ComplexNumber::new(3.0, 4.0)];
-        let scalar = ComplexNumber::new(1.0, 0.0);
-        let product = vec![ComplexNumber::new(1.0, 1.0), ComplexNumber::new(-2.0, -2.0), ComplexNumber::new(3.0, 4.0)];
-        assert_eq!(product, scalar_mul(&scalar, &a_vec));
+        let a = CVec2::new(vec![Complex::new(1.0, 1.0), Complex::new(-2.0, -2.0), Complex::new(3.0, 4.0)]);
+        let scalar = Complex::new(1.0, 0.0);
+        let product = CVec2::new(vec![Complex::new(1.0, 1.0), Complex::new(-2.0, -2.0), Complex::new(3.0, 4.0)]);
+        assert_eq!(product, a.scalar_mul(&scalar));
 
-        let scalar = ComplexNumber::new(2.0, 2.0);
-        let product = vec![ComplexNumber::new(0.0, 4.0), ComplexNumber::new(0.0, -8.0), ComplexNumber::new(-2.0, 14.0)];
-        assert_eq!(product, scalar_mul(&scalar, &a_vec));
+        let scalar = Complex::new(2.0, 2.0);
+        let product = CVec2::new(vec![Complex::new(0.0, 4.0), Complex::new(0.0, -8.0), Complex::new(-2.0, 14.0)]);
+        assert_eq!(product, a.scalar_mul(&scalar));
     }
 }
