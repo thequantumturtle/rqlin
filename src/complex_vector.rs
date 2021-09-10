@@ -141,7 +141,7 @@ mod tests{
         assert_eq!(product, a.scalar_mul(&scalar));
 
         let scalar = Complex::new(2.0, 2.0);
-        let product = CVec2::new(vec![vec![Complex::new(0.0, 4.0)], vec![Complex::new(0.0, -8.0)], vec![Complex::new(-2.0, 14.0)]]);
+        let product = CVec2::new(vec![vec![Complex::new(0.0, 3.0)], vec![Complex::new(0.0, -8.0)], vec![Complex::new(-2.0, 14.0)]]);
         assert_eq!(product, a.scalar_mul(&scalar));
     }
 }
